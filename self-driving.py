@@ -4,9 +4,9 @@ from BrickPi import *
 
 
 class SelfDrivingCar(object):
-
-    def __init__(self, speed):
+    def __init__(self, speed, too_close):
         self.speed = -speed
+        self.too_close = too_close
         self.setup()
 
     def setup(self):
@@ -18,8 +18,10 @@ class SelfDrivingCar(object):
 
     def eval_position(self):
         """Returns True if car should keep going straight False otherwise"""
-
-        return
+        proximity = BrickPi.Sensor[PORT_1]
+        if proximity <= self.too_close:
+            print "The end of the world"
+        print proximity
 
     def move(self):
         BrickPi.MotorSpeed[PORT_A] = self.speed  #Set the speed of MotorA (-255 to 255)
@@ -27,15 +29,14 @@ class SelfDrivingCar(object):
 
     def drive(self):
         while True:
-            print "Running Forward"
-            self.move()
+            # self.move()
             BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-            print BrickPi.Sensor[PORT_1]
+            print self.eval_position()
 
     def turn(self):
         """Turns the car 90 degrees"""
         return
 
 if __name__ == "__main__":
-    car = SelfDrivingCar(255)
+    car = SelfDrivingCar(255, 20)
     car.drive()
