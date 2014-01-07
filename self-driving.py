@@ -39,5 +39,5 @@ class SelfDrivingCar(object):
         return
 
 if __name__ == "__main__":
-    car = SelfDrivingCar(255, 10)
+    car = SelfDrivingCar(255, 20)
     car.drive()
