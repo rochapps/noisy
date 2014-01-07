@@ -19,24 +19,25 @@ class SelfDrivingCar(object):
     def eval_position(self):
         """Returns True if car should keep going straight False otherwise"""
         proximity = BrickPi.Sensor[PORT_1]
-        if proximity <= self.too_close:
-            print "The end of the world"
-        print proximity
+        if proximity and proximity <= self.too_close:
+            return False
+        return True
 
     def move(self):
-        BrickPi.MotorSpeed[PORT_A] = self.speed  #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = self.speed  #Set the speed of MotorB (-255 to 255)
+        BrickPi.MotorSpeed[PORT_A] = self.speed  # Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = self.speed  # Set the speed of MotorB (-255 to 255)
 
     def drive(self):
         while True:
-            # self.move()
-            BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-            print self.eval_position()
+            self.move()
+            BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors
+            if not self.eval_position():
+                break
 
     def turn(self):
         """Turns the car 90 degrees"""
         return
 
 if __name__ == "__main__":
-    car = SelfDrivingCar(255, 20)
+    car = SelfDrivingCar(255, 10)
     car.drive()
