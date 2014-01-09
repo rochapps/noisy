@@ -3,7 +3,7 @@ import time
 from BrickPi import *
 
 
-class SelfDrivingCar(object):
+class ReflexDrivingCar(object):
     def __init__(self, speed, too_close):
         self.speed = -speed
         self.too_close = too_close
@@ -55,6 +55,7 @@ class SelfDrivingCar(object):
         BrickPiUpdateValues()
         time.sleep(0.1)
 
+
 if __name__ == "__main__":
-    car = SelfDrivingCar(255, 25)
+    car = ReflexDrivingCar(255, 25)
     car.drive()
