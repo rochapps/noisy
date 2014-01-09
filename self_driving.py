@@ -39,13 +39,13 @@ class ReflexDrivingCar(object):
             self.move_forward()
             if not self.eval_position():
                 self.stop()
-                self.turn(time=0.3)
+                self.turn(duration=0.3)
 
-    def turn(self, time):
+    def turn(self, duration):
         """Turns the car 90 degrees"""
         BrickPi.MotorSpeed[PORT_A] = 50  # Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_B] = 0  # Set the speed of MotorB (-255 to 255)
-        time.sleep(time)  # keep turning for 0.3 seconds
+        time.sleep(duration)  # keep turning for 0.3 seconds
         return
 
     def stop(self):
