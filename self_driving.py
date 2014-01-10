@@ -1,57 +1,72 @@
+import random
 import time
 
-from BrickPi import *
+from BrickPi import BrickPi, BrickPiSetup, BrickPiSetupSensors, BrickPiUpdateValues, \
+    PORT_A, PORT_B, PORT_1, TYPE_SENSOR_ULTRASONIC_CONT
 
 
 class ReflexDrivingCar(object):
-    def __init__(self, speed, too_close):
-        self.speed = speed
-        self.too_close = too_close
-        self.distances = []
+    def __init__(self, speed=255):
+        self.speed = speed  # (-255 to 255)
+        self.too_close = 25
         self.setup()
 
-    def setup(self):
-        BrickPiSetup()  # setup the serial port for communication
-        BrickPi.MotorEnable[PORT_A] = 1  # Enable the Motor A
-        BrickPi.MotorEnable[PORT_B] = 1  # Enable the Motor B
-        BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT
-        # BrickPi.Timeout = 1000  # 1 sec
-        BrickPiSetupSensors()   # Send the properties of sensors to BrickPi
+    def drive(self):
+        while True:
+            turn_direction = random.choice(["left", "right"])
+            while self.continue_moving:
+                # Move forward while there is nothing too close ahead.
+                self.move_forward()
+                time.sleep(0.1)
+            while not self.continue_moving:
+                # Turn once you get too close to an object.
+                self.turn(direction=turn_direction)
+                time.sleep(0.1)
 
-    def eval_position(self):
-        """Returns True if car should keep going straight False otherwise"""
+    @property
+    def continue_moving(self):
+        """Returns True if car should keep moving forward or false if it should turn."""
         proximity = BrickPi.Sensor[PORT_1]
-        print proximity
         if proximity and proximity <= self.too_close:
             return False
         return True
 
     def move_forward(self):
-        BrickPi.MotorSpeed[PORT_A] = self.speed  # Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = self.speed  # Set the speed of MotorB (-255 to 255)
-        BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors
+        """Moves the car forward."""
+        BrickPi.MotorSpeed[PORT_A] = self.speed
+        BrickPi.MotorSpeed[PORT_B] = self.speed
+        BrickPiUpdateValues()
 
-    def drive(self):
-        while True:
-            self.move_forward()
-            self.turn()
+    @staticmethod
+    def setup():
+        """Enables the motors and sensors for use."""
+        BrickPiSetup()
+        BrickPi.MotorEnable[PORT_A] = 1
+        BrickPi.MotorEnable[PORT_B] = 1
+        BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT
+        BrickPiSetupSensors()
+        BrickPiUpdateValues()
 
-    def turn(self):
-        """Turns the car 90 degrees"""
-        while not self.eval_position():
-            BrickPi.MotorSpeed[PORT_A] = 255  # Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_B] = -255  # Set the speed of MotorB (-255 to 255)
-            BrickPiUpdateValues()
-            time.sleep(0.1)
-
-    def stop(self):
-        """Stops moving car"""
+    @staticmethod
+    def stop():
+        """Stops the car."""
         BrickPi.MotorSpeed[PORT_A] = 0  # Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_B] = 0  # Set the speed of MotorB (-255 to 255)
         BrickPiUpdateValues()
-        time.sleep(0.1)
+
+    @staticmethod
+    def turn(direction="right"):
+        """Turns the car until there is nothing in front of it."""
+        if direction == "right":
+            BrickPi.MotorSpeed[PORT_A] = 255  # Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = -255  # Set the speed of MotorB (-255 to 255)
+            BrickPiUpdateValues()
+        else:
+            BrickPi.MotorSpeed[PORT_A] = -255  # Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = 255  # Set the speed of MotorB (-255 to 255)
+            BrickPiUpdateValues()
 
 
 if __name__ == "__main__":
-    car = ReflexDrivingCar(255, 25)
+    car = ReflexDrivingCar()
     car.drive()
