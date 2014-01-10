@@ -1,5 +1,6 @@
-BrickPi Car
+Noisy
 ============
 
-A sample project using the brickpi, two lego motors and a ultrasonic sensor.
+Noisy is a self driving robot that avoid objects as he drives. It uses the
+RasberryPi, the BrickPi to connect two lego motors and an ultrasonic sensor.
 
