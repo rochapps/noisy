@@ -5,7 +5,7 @@ from BrickPi import *
 
 class ReflexDrivingCar(object):
     def __init__(self, speed, too_close):
-        self.speed = -speed
+        self.speed = speed
         self.too_close = too_close
         self.distances = []
         self.setup()
@@ -18,13 +18,10 @@ class ReflexDrivingCar(object):
         # BrickPi.Timeout = 1000  # 1 sec
         BrickPiSetupSensors()   # Send the properties of sensors to BrickPi
 
-    def even_out_proximity(self):
-        """Makes sure that the sensor is giving us a correct reading."""
-        return
-
     def eval_position(self):
         """Returns True if car should keep going straight False otherwise"""
         proximity = BrickPi.Sensor[PORT_1]
+        print proximity
         if proximity and proximity <= self.too_close:
             return False
         return True
@@ -37,16 +34,15 @@ class ReflexDrivingCar(object):
     def drive(self):
         while True:
             self.move_forward()
-            if not self.eval_position():
-                self.stop()
-                self.turn(duration=0.3)
+            self.turn()
 
-    def turn(self, duration):
+    def turn(self):
         """Turns the car 90 degrees"""
-        BrickPi.MotorSpeed[PORT_A] = 50  # Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = 0  # Set the speed of MotorB (-255 to 255)
-        time.sleep(duration)  # keep turning for 0.3 seconds
-        return
+        while not self.eval_position():
+            BrickPi.MotorSpeed[PORT_A] = 255  # Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = -255  # Set the speed of MotorB (-255 to 255)
+            BrickPiUpdateValues()
+            time.sleep(0.1)
 
     def stop(self):
         """Stops moving car"""
