@@ -26,7 +26,6 @@ class SelfDrivingRobot(object):
         """Returns the direction in which the robot needs to move"""
         proximity = BrickPi.Sensor[PORT_1]
         if proximity and proximity > 25:
-            self.turn_direction = random.choice(["left", "right"])
             return "forward"
         elif proximity and 5 < proximity <= 25:
             return self.turn_direction
