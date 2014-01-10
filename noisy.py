@@ -28,7 +28,7 @@ class SelfDrivingRobot(object):
         if proximity and proximity > 25:
             self.turn_direction = random.choice(["left", "right"])
             return "forward"
-        elif proximity and 5 > proximity <= 25:
+        elif proximity and 5 < proximity <= 25:
             return self.turn_direction
         else:
             return "backwards"
